@@ -46,18 +46,8 @@ all help:
 
 MAL_IMPL = js
 
-# cbm or qbasic
-basic_MODE = cbm
-# clj or cljs (Clojure vs ClojureScript/lumo)
-clojure_MODE = clj
-# python, js, cpp, or neko
-haxe_MODE = neko
-# octave or matlab
-matlab_MODE = octave
 # python, python2 or python3
 python_MODE = python
-# scheme (chibi, kawa, gauche, chicken, sagittarius, cyclone, foment)
-scheme_MODE = chibi
 
 # Extra options to pass to runtest.py
 TEST_OPTS =
@@ -78,12 +68,7 @@ DOCKERIZE =
 # Implementation specific settings
 #
 
-IMPLS = ada awk bash basic c chuck clojure coffee common-lisp cpp crystal cs d dart \
-	elisp elixir elm erlang es6 factor forth fsharp go groovy gst guile haskell \
-	haxe hy io java js julia kotlin livescript logo lua make mal matlab miniMAL \
-	nasm nim objc objpascal ocaml perl perl6 php pil plpgsql plsql powershell ps \
-	python r racket rexx rpython ruby rust scala scheme skew swift swift3 tcl \
-	ts vb vhdl vimscript yorick
+IMPLS = python
 
 EXTENSION = .mal
 
@@ -114,135 +99,24 @@ regress_step8 = $(regress_step7) step8
 regress_step9 = $(regress_step8) step9
 regress_stepA = $(regress_step9) stepA
 
-test_EXCLUDES += test^bash^step5   # never completes at 10,000
-test_EXCLUDES += test^basic^step5  # too slow, and limited to ints of 2^16
-test_EXCLUDES += test^logo^step5   # too slow for 10,000
-test_EXCLUDES += test^make^step5   # no TCO capability (iteration or recursion)
 test_EXCLUDES += test^mal^step5    # host impl dependent
-test_EXCLUDES += test^matlab^step5 # never completes at 10,000
-test_EXCLUDES += test^plpgsql^step5 # too slow for 10,000
-test_EXCLUDES += test^plsql^step5  # too slow for 10,000
-test_EXCLUDES += test^powershell^step5  # too slow for 10,000
-test_EXCLUDES += $(if $(filter cpp,$(haxe_MODE)),test^haxe^step5,) # cpp finishes 10,000, segfaults at 100,000
 
 perf_EXCLUDES = mal  # TODO: fix this
 
 dist_EXCLUDES += mal
-# TODO: still need to implement dist
-dist_EXCLUDES += guile io julia matlab swift
 
 
 # Extra options to pass to runtest.py
-logo_TEST_OPTS = --start-timeout 60 --test-timeout 120
 mal_TEST_OPTS = --start-timeout 60 --test-timeout 120
-miniMAL_TEST_OPTS = --start-timeout 60 --test-timeout 120
-perl6_TEST_OPTS = --test-timeout=60
-plpgsql_TEST_OPTS = --start-timeout 60 --test-timeout 180
-plsql_TEST_OPTS = --start-timeout 120 --test-timeout 120
-vimscript_TEST_OPTS = --test-timeout 30
-ifeq ($(MAL_IMPL),vimscript)
-mal_TEST_OPTS = --start-timeout 60 --test-timeout 180
-else ifeq ($(MAL_IMPL),powershell)
-mal_TEST_OPTS = --start-timeout 60 --test-timeout 180
-endif
 
 
 #
 # Implementation specific utility functions
 #
 
-basic_STEP_TO_PROG_cbm    = basic/$($(1)).bas
-basic_STEP_TO_PROG_qbasic = basic/$($(1))
-
-clojure_STEP_TO_PROG_clj  = clojure/target/$($(1)).jar
-clojure_STEP_TO_PROG_cljs = clojure/src/mal/$($(1)).cljc
-
-haxe_STEP_TO_PROG_neko   = haxe/$($(1)).n
-haxe_STEP_TO_PROG_python = haxe/$($(1)).py
-haxe_STEP_TO_PROG_cpp    = haxe/cpp/$($(1))
-haxe_STEP_TO_PROG_js     = haxe/$($(1)).js
-
-scheme_STEP_TO_PROG_chibi       = scheme/$($(1)).scm
-scheme_STEP_TO_PROG_kawa        = scheme/out/$($(1)).class
-scheme_STEP_TO_PROG_gauche      = scheme/$($(1)).scm
-scheme_STEP_TO_PROG_chicken     = scheme/$($(1))
-scheme_STEP_TO_PROG_sagittarius = scheme/$($(1)).scm
-scheme_STEP_TO_PROG_cyclone     = scheme/$($(1))
-scheme_STEP_TO_PROG_foment      = scheme/$($(1)).scm
-
 # Map of step (e.g. "step8") to executable file for that step
-ada_STEP_TO_PROG =     ada/$($(1))
-awk_STEP_TO_PROG =     awk/$($(1)).awk
-bash_STEP_TO_PROG =    bash/$($(1)).sh
-basic_STEP_TO_PROG =   $(basic_STEP_TO_PROG_$(basic_MODE))
-c_STEP_TO_PROG =       c/$($(1))
-chuck_STEP_TO_PROG =   chuck/$($(1)).ck
-clojure_STEP_TO_PROG = $(clojure_STEP_TO_PROG_$(clojure_MODE))
-coffee_STEP_TO_PROG =  coffee/$($(1)).coffee
-common-lisp_STEP_TO_PROG =  common-lisp/$($(1))
-cpp_STEP_TO_PROG =     cpp/$($(1))
-crystal_STEP_TO_PROG = crystal/$($(1))
-cs_STEP_TO_PROG =      cs/$($(1)).exe
-d_STEP_TO_PROG =       d/$($(1))
-dart_STEP_TO_PROG =    dart/$($(1)).dart
-elisp_STEP_TO_PROG =   elisp/$($(1)).el
-elixir_STEP_TO_PROG =  elixir/lib/mix/tasks/$($(1)).ex
-elm_STEP_TO_PROG =     elm/$($(1)).js
-erlang_STEP_TO_PROG =  erlang/$($(1))
-es6_STEP_TO_PROG =     es6/$($(1)).mjs
-factor_STEP_TO_PROG =  factor/$($(1))/$($(1)).factor
-forth_STEP_TO_PROG =   forth/$($(1)).fs
-fsharp_STEP_TO_PROG =  fsharp/$($(1)).exe
-go_STEP_TO_PROG =      go/$($(1))
-groovy_STEP_TO_PROG =  groovy/$($(1)).groovy
-gst_STEP_TO_PROG =     gst/$($(1)).st
-guile_STEP_TO_PROG =   guile/$($(1)).scm
-haskell_STEP_TO_PROG = haskell/$($(1))
-haxe_STEP_TO_PROG =    $(haxe_STEP_TO_PROG_$(haxe_MODE))
-hy_STEP_TO_PROG =      hy/$($(1)).hy
-io_STEP_TO_PROG =      io/$($(1)).io
-java_STEP_TO_PROG =    java/target/classes/mal/$($(1)).class
-js_STEP_TO_PROG =      js/$($(1)).js
-julia_STEP_TO_PROG =   julia/$($(1)).jl
-kotlin_STEP_TO_PROG =  kotlin/$($(1)).jar
-livescript_STEP_TO_PROG = livescript/$($(1)).js
-logo_STEP_TO_PROG =    logo/$($(1)).lg
-lua_STEP_TO_PROG =     lua/$($(1)).lua
-make_STEP_TO_PROG =    make/$($(1)).mk
 mal_STEP_TO_PROG =     mal/$($(1)).mal
-matlab_STEP_TO_PROG =  matlab/$($(1)).m
-miniMAL_STEP_TO_PROG = miniMAL/$($(1)).json
-nasm_STEP_TO_PROG =    nasm/$($(1))
-nim_STEP_TO_PROG =     nim/$($(1))
-objc_STEP_TO_PROG =    objc/$($(1))
-objpascal_STEP_TO_PROG = objpascal/$($(1))
-ocaml_STEP_TO_PROG =   ocaml/$($(1))
-perl_STEP_TO_PROG =    perl/$($(1)).pl
-perl6_STEP_TO_PROG =   perl6/$($(1)).pl
-php_STEP_TO_PROG =     php/$($(1)).php
-pil_STEP_TO_PROG =     pil/$($(1)).l
-plpgsql_STEP_TO_PROG = plpgsql/$($(1)).sql
-plsql_STEP_TO_PROG =   plsql/$($(1)).sql
-powershell_STEP_TO_PROG =  powershell/$($(1)).ps1
-ps_STEP_TO_PROG =      ps/$($(1)).ps
 python_STEP_TO_PROG =  python/$($(1)).py
-r_STEP_TO_PROG =       r/$($(1)).r
-racket_STEP_TO_PROG =  racket/$($(1)).rkt
-rexx_STEP_TO_PROG =    rexx/$($(1)).rexxpp
-rpython_STEP_TO_PROG = rpython/$($(1))
-ruby_STEP_TO_PROG =    ruby/$($(1)).rb
-rust_STEP_TO_PROG =    rust/target/release/$($(1))
-scala_STEP_TO_PROG =   scala/target/scala-2.11/classes/$($(1)).class
-scheme_STEP_TO_PROG =  $(scheme_STEP_TO_PROG_$(scheme_MODE))
-skew_STEP_TO_PROG =    skew/$($(1)).js
-swift_STEP_TO_PROG =   swift/$($(1))
-swift3_STEP_TO_PROG =  swift3/$($(1))
-tcl_STEP_TO_PROG =     tcl/$($(1)).tcl
-ts_STEP_TO_PROG =      ts/$($(1)).js
-vb_STEP_TO_PROG =      vb/$($(1)).exe
-vhdl_STEP_TO_PROG =    vhdl/$($(1))
-vimscript_STEP_TO_PROG = vimscript/$($(1)).vim
-yorick_STEP_TO_PROG =  yorick/$($(1)).i
 
 
 #
